@@ -1,0 +1,93 @@
+.users-container {
+  background: rgba(9, 9, 18, 0.8);
+  border-radius: 28px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-strong);
+}
+
+.users-title {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.users-subtitle {
+  color: var(--text-muted);
+  margin: 0.5rem 0 2rem;
+}
+
+.users-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.user-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.user-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+}
+
+.user-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.role-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+}
+
+.role-player {
+  background: rgba(255, 92, 27, 0.15);
+  color: var(--accent);
+}
+
+.role-admin {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.role-spectator {
+  background: rgba(133, 196, 255, 0.2);
+  color: #87c5ff;
+}
+
+.user-actions {
+  margin-top: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ghost-btn {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #fff;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.ghost-btn.ghost-outline {
+  border-color: rgba(255, 92, 27, 0.4);
+  color: var(--accent);
+}
+
+.no-users {
+  text-align: center;
+  color: var(--text-muted);
+}

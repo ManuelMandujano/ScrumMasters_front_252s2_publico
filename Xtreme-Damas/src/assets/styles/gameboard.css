@@ -1,0 +1,106 @@
+.gameboard-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.matchroom-header h1 {
+  margin: 0.5rem 0;
+}
+
+.matchroom-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.matchroom-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.matchroom-header p {
+  color: var(--text-muted);
+}
+
+.matchroom-header .secondary-btn {
+  background: var(--sp-bg);
+  color: var(--sp-text);
+  border: 1px solid var(--sp-border);
+  border-radius: 14px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.matchroom-header .secondary-btn:hover,
+.matchroom-header .secondary-btn:focus-visible {
+  background: var(--sp-bg-hover);
+}
+
+.danger-btn {
+  border-radius: 14px;
+  border: 1px solid #ff7b7b;
+  background: rgba(255, 123, 123, 0.15);
+  color: #ff7b7b;
+  padding: 0.5rem 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.danger-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.danger-btn:not(:disabled):hover,
+.danger-btn:not(:disabled):focus-visible {
+  background: rgba(255, 123, 123, 0.3);
+}
+
+.board-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(240px, 320px);
+  gap: 1.5rem;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel-block {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.panel-block h3 {
+  margin-top: 0;
+}
+
+.panel-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+}
+
+.player-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.auth-error {
+  color: #ff7b7b;
+}
+
+@media (max-width: 900px) {
+  .board-layout {
+    grid-template-columns: 1fr;
+  }
+}

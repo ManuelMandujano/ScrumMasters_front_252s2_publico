@@ -1,0 +1,160 @@
+.matchroom-header h1 {
+  margin: 0.5rem 0;
+}
+
+.matchroom-header p {
+  color: var(--text-muted);
+}
+
+.matchroom-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.matchroom-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.matchroom-code-label {
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.matchroom-code {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.matchroom-status {
+  color: var(--text-muted);
+}
+
+.meta-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.meta-actions button {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #fff;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+}
+
+.meta-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.matchroom-feedback {
+  color: var(--accent);
+  margin: -0.5rem 0 0;
+}
+
+.players-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.player-card {
+  border-radius: 24px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(20, 20, 30, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.player-card.ready {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(255, 92, 27, 0.3);
+}
+
+.player-seat {
+  letter-spacing: 0.3rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.player-status {
+  color: var(--text-muted);
+}
+
+.player-card button {
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent-strong);
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+
+.chat-section {
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.35);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.player-slot-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ready-pill {
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  padding: 0.4rem 1.1rem;
+  color: var(--accent);
+}
+
+.chat-body {
+  min-height: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.chat-message strong {
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+
+.chat-input {
+  display: flex;
+  gap: 1rem;
+}
+
+.chat-input input {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+}
+
+.chat-input button {
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #0b0b10;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+}

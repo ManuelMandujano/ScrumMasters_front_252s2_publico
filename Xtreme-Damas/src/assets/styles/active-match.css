@@ -1,0 +1,21 @@
+.active-match-button {
+  position: fixed;
+  top: 4.5rem;
+  right: 1.25rem;
+  z-index: 50;
+  border: none;
+  border-radius: 999px;
+  padding: 0.75rem 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  background: var(--sp-bg, #0b0606);
+  color: var(--sp-text, #ffa733);
+  border: 1px solid var(--sp-border, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.active-match-button:hover,
+.active-match-button:focus-visible {
+  background: var(--sp-bg-hover, #160b0b);
+}
