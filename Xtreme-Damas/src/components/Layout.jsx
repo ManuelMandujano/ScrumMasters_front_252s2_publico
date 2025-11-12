@@ -78,6 +78,9 @@ function Layout() {
           <NavLink onClick={closeNav} to="/lobby">
             Lobby
           </NavLink>
+          <NavLink onClick={closeNav} to="/nosotros">
+            Nosotros
+          </NavLink>
           {user ? (
             <>
               <NavLink onClick={closeNav} to="/dashboard">

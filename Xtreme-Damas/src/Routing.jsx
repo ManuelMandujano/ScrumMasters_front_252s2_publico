@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './views/App.jsx';
 import Instructions from './views/instructions.jsx';
 import Users from './views/users.jsx';
+import Nosotros from './views/nosotros.jsx';
 import Login from './views/auth/Login.jsx';
 import Register from './views/auth/Register.jsx';
 import PlayerDashboard from './views/dashboard/PlayerDashboard.jsx';
@@ -22,6 +23,7 @@ function Routing() {
           <Route path="/lobby" element={<Lobby />} />
           <Route path="/match-room" element={<MatchRoom />} />
           <Route path="/game-board" element={<GameBoard />} />
+          <Route path="/nosotros" element={<Nosotros />} />
           <Route
             path="/users"
             element={(
