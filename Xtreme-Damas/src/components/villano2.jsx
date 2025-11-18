@@ -7,13 +7,12 @@ function Villano2() {
         <img src={villano} alt="Villano" className="avatar-img" />
       </div>
       <div className="member-info">
-        <h3>Villano: Rodrigo Sebastian Villena Manzano</h3>
-        <p className="member-role">BITCH ASS NIGGA</p>
+        <h3>Rodrigo Sebastian Villena Manzano</h3>
+        <p className="member-role">Lil Computin</p>
         <p className="member-bio">
           Responsable de la lógica del juego y mecánicas especiales. 
           Implementó el tablero, sistema de turnos, poderes y trampas dinámicas.
-          Todo lo que esta bien en este mundo, en vez de ser TI es computacion, le gusta
-          el macDionals.
+          Mayor industrial y Minor computación. Dato freak: no sabe dividir por 3.
         </p>
         <div className="member-tags">
           <span className="tag">JavaScript</span>

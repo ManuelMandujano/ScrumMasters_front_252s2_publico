@@ -7,12 +7,13 @@ function Mandupro2() {
         <img src={mandupro} alt="Mandupro" className="avatar-img" />
       </div>
       <div className="member-info">
-        <h3>Mandupro: Manuel Mandujano Asta-Buruaga</h3>
-        <p className="member-role">Full Stack Gooner</p>
+        <h3>Manuel Mandujano Asta-Buruaga</h3>
+        <p className="member-role"> Mandupro </p>
         <p className="member-bio">
           Especializado en backend y arquitectura de base de datos. 
-          Implementó el sistema de migración, seeders y la API REST con Koa. Piensa que 
-          este ramo es una verga, pero en verdad no es asi, aguante. Likes cheese
+          Implementó el sistema de migración, seeders, la API REST con Koa el inicio de 
+          sesion con jwt y el bycript. 
+          Mayor industrial, Minor TI. Likes cheese.
         </p>
         <div className="member-tags">
           <span className="tag">Node.js</span>

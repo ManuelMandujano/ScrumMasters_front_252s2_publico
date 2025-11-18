@@ -7,12 +7,13 @@ function Niggaemi2() {
         <img src={niggaemi} alt="Niggaemi" className="avatar-img" />
       </div>
       <div className="member-info">
-        <h3>Niggaemi: Paulo Noemi Zuleta</h3>
-        <p className="member-role">Esta en la feuc</p>
+        <h3> Paulo Noemi Zuleta</h3>
+        <p className="member-role"> Niño feuc </p>
         <p className="member-bio">
           Enfocado en la experiencia de usuario y componentes React. 
-          Desarrolló el (nada) lobby, sala previa y sistema de matchmaking en tiempo real?
-          Le gusta el pollo frito y el anime. Ademas es negro. Lol.
+          Desarrolló el lobby, sala previa y sistema de matchmaking en tiempo real. 
+          Mayor industrial, Minor TI.
+          Le gusta el pollo frito y el anime, ademas estuvo en la feuc.
         </p>
         <div className="member-tags">
           <span className="tag">React</span>
