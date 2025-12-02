@@ -1,38 +1,37 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useActiveMatch } from '../context/ActiveMatchContext.jsx';
 import '../assets/styles/active-match.css';
 
 function ActiveMatchShortcut() {
-  const { activeMatch, viewingMatchId } = useActiveMatch();
+  const { activeMatch } = useActiveMatch();
   const location = useLocation();
-  const navigate = useNavigate();
 
+  // 1) Si no hay partida activa, no mostramos nada
   if (!activeMatch || !activeMatch.matchId) {
     return null;
   }
 
-  const isOwnMatchView = location.pathname.startsWith('/game-board')
-    && viewingMatchId != null
-    && activeMatch.matchId === viewingMatchId
-    && Boolean(activeMatch.seat);
+  // 2) Si ya estamos en el tablero, no tiene sentido mostrar el botón flotante
+  if (location.pathname.startsWith('/game-board')) {
+    return null;
+  }
 
-  if (isOwnMatchView) return null;
-
-  if (activeMatch.status !== 'ongoing') {
+  // 3) Si la partida terminó, no mostramos el botón
+  if (activeMatch.status === 'finished') {
     return null;
   }
 
   const handleClick = () => {
-    navigate('/game-board', {
-      state: {
-        matchId: activeMatch.matchId,
-        seat: activeMatch.seat || ''
-      }
-    });
+    // Navegación dura para evitar dramas con navigate()
+    window.location.assign('/game-board');
   };
 
   return (
-    <button type="button" className="active-match-button" onClick={handleClick}>
+    <button
+      type="button"
+      className="active-match-button"
+      onClick={handleClick}
+    >
       ↩
       {' '}
       Volver a la partida #

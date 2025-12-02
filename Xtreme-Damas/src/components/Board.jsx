@@ -1,6 +1,13 @@
 import '../assets/styles/board.css';
 
-function Board({ pieces = [], traps = [], size = 10 }) {
+function Board({
+  pieces = [],
+  traps = [],
+  size = 10,
+  onCellClick,
+  selectedCell,
+  possibleTargets = []
+}) {
   const pieceMap = new Map();
   pieces
     .filter((piece) => piece.alive)
@@ -18,12 +25,43 @@ function Board({ pieces = [], traps = [], size = 10 }) {
       const key = `${row}-${col}`;
       const piece = pieceMap.get(key);
       const trap = trapMap.get(key);
+
+      const isSelected = selectedCell
+        && selectedCell.r === row
+        && selectedCell.c === col;
+
+      const isTarget = possibleTargets.some(
+        (cell) => cell.r === row && cell.c === col
+      );
+
       const cellClass = ['board-cell', (row + col) % 2 === 0 ? 'light' : 'dark'];
+
       if (trap?.revealed) {
         cellClass.push('trap');
       }
+      if (isSelected) {
+        cellClass.push('selected');
+      }
+      if (isTarget) {
+        cellClass.push('target');
+      }
+
+      const handleClick = () => {
+        if (!onCellClick) return;
+        onCellClick({
+          r: row,
+          c: col,
+          piece,
+          trap
+        });
+      };
+
       return (
-        <div key={key} className={cellClass.join(' ')}>
+        <div
+          key={key}
+          className={cellClass.join(' ')}
+          onClick={handleClick}
+        >
           <span className="cell-coord">
             {row + 1}
             ,
@@ -38,6 +76,7 @@ function Board({ pieces = [], traps = [], size = 10 }) {
         </div>
       );
     });
+
     return (
       <div key={row} className="board-row">
         {cells}

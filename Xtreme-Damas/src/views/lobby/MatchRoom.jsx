@@ -215,6 +215,16 @@ function MatchRoom() {
 
   const occupiedSeats = match?.players?.length || 0;
   const waitingStatus = occupiedSeats < 2 ? 'Esperando a que otro jugador se una...' : 'Ambos asientos ocupados.';
+  if (error) {
+    return (
+      <div className="matchroom-error">
+        <p className="auth-error">{error}</p>
+        <button className="secondary-btn" onClick={() => navigate("/lobby")}>
+          Volver al lobby
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="matchroom-shell">

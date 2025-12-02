@@ -183,34 +183,40 @@ function Lobby() {
 
   const handleJoinMatch = async (matchId, { fromCode = false } = {}) => {
     if (!requireAuth()) return;
-    if (hasBlockingActiveMatch && activeMatch.matchId !== matchId) {
-      setActionError(`Ya participas en la partida #${activeMatch.matchId}.`);
-      return;
-    }
+
     setActionError(null);
     setActionSuccess(null);
-    if (fromCode) {
-      setJoiningByCode(true);
-    } else {
-      setJoiningMatchId(matchId);
-    }
+
+    if (fromCode) setJoiningByCode(true);
+    else setJoiningMatchId(matchId);
+
     try {
       const data = await joinMatchOnServer(matchId);
-      setActionSuccess(`Te uniste a la partida #${matchId} como asiento ${data.seat}.`);
-      if (fromCode) {
-        setCode('');
-      }
-      navigate('/match-room', { state: { matchId } });
+
+      setActiveMatch({
+        matchId,
+        seat: data.seat,
+      });
+
+      if (fromCode) setCode("");
+
+      navigate("/match-room", { state: { matchId } });
     } catch (err) {
-      setActionError(err.response?.data?.error || 'No se pudo unir a la partida.');
-    } finally {
-      if (fromCode) {
-        setJoiningByCode(false);
+      const status = err.response?.status;
+
+      if (status === 404) {
+        setActionError(`No existe ninguna partida con el código ${matchId}.`);
+      } else if (status === 400) {
+        setActionError(err.response?.data?.error || "No se pudo unir a la partida.");
       } else {
-        setJoiningMatchId(null);
+        setActionError("Error al conectarse al servidor.");
       }
+    } finally {
+      if (fromCode) setJoiningByCode(false);
+      else setJoiningMatchId(null);
     }
   };
+
 
   const handleJoinByCode = async () => {
     const trimmed = code.trim();
@@ -359,22 +365,84 @@ function Lobby() {
                 ))}
               </div>
               <div className="match-actions">
-                <button
-                  type="button"
-                  className="primary-btn"
-                  onClick={() => handleJoinMatch(match.id)}
-                  disabled={joiningMatchId === match.id}
-                >
-                  {joiningMatchId === match.id ? 'Uniendo...' : 'Unirse'}
-                </button>
-                <button
-                  type="button"
-                  className="secondary-btn"
-                  onClick={() => handleSpectate(match.id)}
-                >
-                  👁 Expectar
-                </button>
+                {(() => {
+                  const isPlayer = user
+                    && Array.isArray(match.players)
+                    && match.players.some((p) => p.userId === user.id);
+
+                  const isJoinable = match.status === 'waiting' && !isPlayer;
+                  const canResume = isPlayer && match.status !== 'finished';
+
+                  // 1) Caso: puedo unirme (partida en waiting y no soy jugador)
+                  if (isJoinable) {
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          className="primary-btn"
+                          onClick={() => handleJoinMatch(match.id)}
+                          disabled={joiningMatchId === match.id}
+                        >
+                          {joiningMatchId === match.id ? 'Uniendo...' : 'Unirse'}
+                        </button>
+                        <button
+                          type="button"
+                          className="secondary-btn"
+                          onClick={() => handleSpectate(match.id)}
+                        >
+                          👁 Expectar
+                        </button>
+                      </>
+                    );
+                  }
+
+                  // 2) Caso: ya soy jugador y la partida sigue viva → "Volver a la partida"
+                  if (canResume) {
+                    const seat = (match.players || []).find(
+                      (p) => p.userId === user.id
+                    )?.seat || '';
+
+                    return (
+                      <>
+                        <button
+                          type="button"
+                          className="primary-btn"
+                          onClick={() => {
+                            // Actualizar el activeMatch y mandar al tablero
+                            setActiveMatch({
+                              matchId: match.id,
+                              seat,
+                              status: match.status
+                            });
+                            window.location.assign('/game-board');
+                          }}
+                        >
+                          Volver a la partida
+                        </button>
+                        <button
+                          type="button"
+                          className="secondary-btn"
+                          onClick={() => handleSpectate(match.id)}
+                        >
+                          👁 Expectar
+                        </button>
+                      </>
+                    );
+                  }
+
+                  // 3) Caso: no me puedo unir (por ejemplo ongoing y no soy jugador) → solo expectar
+                  return (
+                    <button
+                      type="button"
+                      className="secondary-btn"
+                      onClick={() => handleSpectate(match.id)}
+                    >
+                      👁 Expectar
+                    </button>
+                  );
+                })()}
               </div>
+
             </article>
           ))}
           {filteredMatches.length === 0 && (
