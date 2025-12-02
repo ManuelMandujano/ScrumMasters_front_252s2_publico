@@ -93,37 +93,6 @@ Estas características **fueron desarrolladas**, pero requieren ajustes para fun
 ### 🔄 Intercambio de poderes entre jugadores
 Aunque se intentó diseñar la lógica del intercambio (válida solo si ambas partes poseen el poder solicitado), **esta funcionalidad quedó fuera del alcance de la entrega**, tanto por complejidad de interfaz como por necesidad de nuevas migraciones y endpoints adicionales.
 
----
-
-# 🛠️ Instrucciones para Ejecutar el Proyecto
-
-## ▶️ Backend
-
-```
-cd ScrumMasters_back_252s2
-npm install
-npm run dev
-```
-
-Configurar el archivo `.env` con la base de datos correspondiente.
-
----
-
-## 💻 Frontend
-
-```
-cd ScrumMasters_front_252s2_publico/Xtreme-Damas
-npm install
-npm run dev
-```
-
-La aplicación estará disponible en:
-
-```
-http://localhost:5173/
-```
-
----
 
 # 🧪 Cómo Probar los Poderes
 
@@ -139,4 +108,4 @@ http://localhost:5173/
    - Estado general  
 
 **ScrumMasters – Ingeniería UC ✨**  
-Xtreme Damas – Entrega Final
+Xtreme Damas – Entrega Fina
