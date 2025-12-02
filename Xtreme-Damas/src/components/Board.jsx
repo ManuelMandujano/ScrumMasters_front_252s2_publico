@@ -68,7 +68,13 @@ function Board({
             {col + 1}
           </span>
           {piece && (
-            <div className={`piece piece-${piece.seat.toLowerCase()}`}>
+            <div
+              className={
+                `piece piece-${piece.seat.toLowerCase()} ${
+                  piece.statusEffects?.shield ? 'piece-shielded' : ''
+                }`
+              }
+            >
               <span>{piece.crowned ? '♕' : '●'}</span>
             </div>
           )}

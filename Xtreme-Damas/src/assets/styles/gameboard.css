@@ -104,3 +104,73 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.powers-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.power-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  padding: 2px 0;
+}
+
+.power-main {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.power-icon {
+  font-size: 1rem;
+}
+
+.power-name {
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.power-qty {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.power-price {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.power-empty {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.tiny-btn {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.tiny-btn.secondary {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.tiny-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  border-color: rgba(255, 255, 255, 0.15);
+}

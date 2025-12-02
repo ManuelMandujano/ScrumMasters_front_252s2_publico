@@ -10,29 +10,109 @@ import Board from '../../components/Board.jsx';
 import { useActiveMatch } from '../../context/ActiveMatchContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-const POLL_INTERVAL_MS = 100;
+const POLL_INTERVAL_MS = 1000;
 
 const AVAILABLE_POWERS = [
   {
-    slug: 'extra-move',
-    name: 'Movimiento extra',
-    description: 'Te permite hacer un segundo movimiento en tu turno.',
-    price: 10
+    slug: 'escudo',
+    icon: '🛡️',
+    shortName: 'Escudo',
+    description: 'Bloquea una eliminación durante el turno rival.',
+    price: 20
   },
   {
-    slug: 'shield',
-    name: 'Escudo',
-    description: 'Protege una de tus fichas de ser capturada durante un turno.',
-    price: 12
+    slug: 'sanador',
+    icon: '💉',
+    shortName: 'Sanador',
+    description: 'Revive una ficha aliada.',
+    price: 35
   },
   {
-    slug: 'double-capture',
-    name: 'Doble captura',
-    description: 'Ganas monedas extra al capturar una ficha.',
-    price: 15
+    slug: 'super_salto',
+    icon: '⚡',
+    shortName: 'Super salto',
+    description: 'Permite una captura especial (salto avanzado).',
+    price: 25
+  },
+  {
+    slug: 'doble_mov',
+    icon: '🔥',
+    shortName: 'Doble mov.',
+    description: 'Te permite mover dos veces en tu turno.',
+    price: 30
+  },
+  {
+    slug: 'coronacion',
+    icon: '👑',
+    shortName: 'Coronación',
+    description: 'Convierte una ficha en dama al instante.',
+    price: 40
+  },
+  {
+    slug: 'autodestruccion',
+    icon: '💣',
+    shortName: 'Autodestr.',
+    description: 'Elimina una ficha enemiga cercana.',
+    price: 35
+  },
+  {
+    slug: 'trampa',
+    icon: '☠️',
+    shortName: 'Trampa',
+    description: 'Coloca una casilla trampa oculta.',
+    price: 25
+  },
+  {
+    slug: 'aturdimiento',
+    icon: '💫',
+    shortName: 'Aturdir',
+    description: 'Deja una ficha rival sin jugar por 2 turnos.',
+    price: 30
   }
-  // Agrega aquí más poderes con los slugs reales de tu backend
 ];
+
+const POWER_BEHAVIOR = {
+  escudo: {
+    requiresPiece: true,
+    owner: 'self',      // solo funciona sobre pieza tuya
+    label: 'Escudo'
+  },
+  sanador: {
+    // asumiremos que sanador revive una ficha en una casilla vacía elegida
+    requiresCell: true,
+    mustBeEmpty: true,  // casilla sin pieza ni trampa
+    label: 'Sanador'
+  },
+  super_salto: {
+    requiresPiece: false,
+    label: 'Super salto'
+  },
+  doble_mov: {
+    requiresPiece: false,
+    label: 'Doble movimiento'
+  },
+  coronacion: {
+    requiresPiece: true,
+    owner: 'self',
+    label: 'Coronación'
+  },
+  autodestruccion: {
+    requiresPiece: true,
+    owner: 'opponent',  // solo sobre pieza rival
+    label: 'Autodestrucción'
+  },
+  trampa: {
+    requiresCell: true,
+    mustBeEmpty: true,
+    label: 'Casilla trampa'
+  },
+  aturdimiento: {
+    requiresPiece: true,
+    owner: 'opponent',
+    label: 'Aturdimiento'
+  }
+};
+
 
 
 function GameBoard() {
@@ -228,48 +308,121 @@ function GameBoard() {
     setPurchasingPower(powerSlug);
 
     try {
+      // Llamada al backend
       await apiClient.post(`/matches/${matchId}/purchase`, {
         seat: effectiveSeat,
         powerSlug,
         qty: 1
       });
 
-      // Actualizar monedas + inventario
+      // Refrescar monedas + inventario
       await fetchState(matchId, effectiveSeat);
     } catch (err) {
-      setError(err.response?.data?.error || 'No se pudo comprar el poder.');
-    } finally {
-      setPurchasingPower(null);
+      console.error('Error al comprar poder:', err.response?.data || err.message);
+      setError(
+        err.response?.data?.error
+          || err.response?.data?.message
+          || 'No se pudo comprar el poder.'
+      );
     }
+
+    // Forzar limpieza aunque haya error o éxito
+    setPurchasingPower(null);
   };
+
+
 
   const handleActivatePower = async (powerSlug) => {
     if (!matchId || !effectiveSeat || !state) return;
 
-    // Opcional: solo permitir activar en tu turno
+    const config = POWER_BEHAVIOR[powerSlug] || {};
+
+    // Debe ser tu turno
     if (state.match?.currentTurn && state.match.currentTurn !== effectiveSeat) {
       setError('Solo puedes activar poderes en tu turno.');
       return;
+    }
+
+    // Datos de la celda seleccionada
+    const cell = selectedCell;
+    const selectedPiece = cell?.piece || null;
+    const selectedTrap = cell?.trap || null;
+
+    // Validaciones según el tipo de poder
+    if (config.requiresPiece) {
+      if (!cell || !selectedPiece) {
+        setError(`Selecciona primero una ficha para usar ${config.label || 'este poder'}.`);
+        return;
+      }
+
+      const isMine = selectedPiece.seat === effectiveSeat;
+      const isOpponent = !isMine;
+
+      if (config.owner === 'self' && !isMine) {
+        setError('Debes seleccionar una de tus propias fichas.');
+        return;
+      }
+      if (config.owner === 'opponent' && !isOpponent) {
+        setError('Debes seleccionar una ficha del oponente.');
+        return;
+      }
+    }
+
+    if (config.requiresCell) {
+      if (!cell) {
+        setError(`Selecciona una casilla del tablero para usar ${config.label || 'este poder'}.`);
+        return;
+      }
+
+      if (config.mustBeEmpty && (selectedPiece || selectedTrap)) {
+        setError('Debes elegir una casilla vacía (sin ficha ni trampa).');
+        return;
+      }
     }
 
     setError(null);
     setActivatingPower(powerSlug);
 
     try {
-      await apiClient.post(`/matches/${matchId}/activate-power`, {
+      const payload = {
         seat: effectiveSeat,
         powerSlug
-        // Si tu backend necesita objetivos (ficha, casilla, etc.), aquí se agregan
-      });
+      };
 
-      // Refrescar estado (pueden cambiar monedas, inventario, efectos)
+      // Poderes que actúan sobre una pieza
+      if (config.requiresPiece && selectedPiece) {
+        payload.pieceId = selectedPiece.id;
+      }
+
+      // Poderes que actúan sobre una casilla (trampa, sanador, etc.)
+      if (config.requiresCell && cell) {
+        payload.row = cell.r;
+        payload.col = cell.c;
+      }
+
+      const { data } = await apiClient.post(
+        `/matches/${matchId}/activate-power`,
+        payload
+      );
+
+      console.log('Respuesta activando poder:', data);
+
+      // Refrescar monedas, inventario y estado del tablero
       await fetchState(matchId, effectiveSeat);
     } catch (err) {
-      setError(err.response?.data?.error || 'No se pudo activar el poder.');
+      console.error('Error al activar poder:', err.response?.data || err.message);
+      setError(
+        err.response?.data?.error
+          || err.response?.data?.message
+          || 'No se pudo activar el poder.'
+      );
     } finally {
       setActivatingPower(null);
     }
   };
+
+
+
 
 
   const handleSurrender = async () => {
@@ -295,6 +448,15 @@ function GameBoard() {
     // Navegación dura, pero segura
     window.location.assign('/lobby');
   };
+
+  const myInventory = (state?.inventory || [])
+  .filter((item) => item.seat === effectiveSeat && item.qty > 0);
+
+
+  const opponentInventory = (state?.inventory || []).filter(
+    (item) => item.seat && item.seat !== effectiveSeat
+  );
+
 
 
   return (
@@ -372,45 +534,52 @@ function GameBoard() {
               ))}
             </div>
             <div className="panel-block">
-              <h3>Inventario</h3>
-              <ul>
-                {(state.inventory || []).length === 0 && (
-                  <li>No hay poderes comprados</li>
+              <h3>Mis poderes</h3>
+              <ul className="powers-list">
+                {myInventory.length === 0 && (
+                  <li className="power-item">
+                    <span className="power-empty">No tienes poderes</span>
+                  </li>
                 )}
 
-                {(state.inventory || []).map((item) => {
+                {myInventory.map((item) => {
                   const powerDef = AVAILABLE_POWERS.find(
                     (p) => p.slug === item.powerSlug
                   );
 
-                  const label = powerDef?.name || item.powerSlug;
+                  const label = powerDef?.shortName || item.powerSlug;
+                  const icon = powerDef?.icon || '✨';
                   const isMyTurn =
                     state.match?.currentTurn && state.match.currentTurn === effectiveSeat;
 
                   return (
-                    <li key={item.id} className="inventory-item">
-                      <div className="inventory-main">
-                        <strong>{label}</strong>
-                        {' '}
-                        <span>
-                          x
-                          {item.qty}
+                    <li
+                      key={item.id}
+                      className="power-item"
+                      title={powerDef?.description}
+                    >
+                      <div className="power-main">
+                        <span className="power-icon">{icon}</span>
+                        <span className="power-name">
+                          {label}
+                          {' '}
+                          <span className="power-qty">
+                            x
+                            {item.qty}
+                          </span>
                         </span>
                       </div>
                       <button
                         type="button"
-                        className="secondary-btn"
+                        className="tiny-btn secondary"
                         onClick={() => handleActivatePower(item.powerSlug)}
                         disabled={
-                          item.qty <= 0
-                          || !effectiveSeat
+                          !effectiveSeat
                           || !isMyTurn
                           || activatingPower === item.powerSlug
                         }
                       >
-                        {activatingPower === item.powerSlug
-                          ? 'Activando...'
-                          : 'Activar'}
+                        {activatingPower === item.powerSlug ? '...' : 'Usar'}
                       </button>
                     </li>
                   );
@@ -418,8 +587,11 @@ function GameBoard() {
               </ul>
             </div>
 
+
+
+
               <div className="panel-block">
-                <h3>Tienda de poderes</h3>
+                <h3>Tienda</h3>
                 <ul className="powers-list">
                   {AVAILABLE_POWERS.map((power) => {
                     const myPlayer = (state.players || []).find(
@@ -432,23 +604,23 @@ function GameBoard() {
                       state.match?.currentTurn && state.match.currentTurn === effectiveSeat;
 
                     return (
-                      <li key={power.slug} className="power-item">
+                      <li
+                        key={power.slug}
+                        className="power-item"
+                        title={power.description}
+                      >
                         <div className="power-main">
-                          <strong>{power.name}</strong>
-                          {' '}
+                          <span className="power-icon">{power.icon}</span>
+                          <span className="power-name">{power.shortName}</span>
                           <span className="power-price">
-                            (
                             {power.price}
                             {' '}
-                            monedas)
+                            💰
                           </span>
-                        </div>
-                        <div className="power-description">
-                          {power.description}
                         </div>
                         <button
                           type="button"
-                          className="primary-btn"
+                          className="tiny-btn"
                           onClick={() => handlePurchasePower(power.slug)}
                           disabled={
                             purchasingPower === power.slug
@@ -457,17 +629,15 @@ function GameBoard() {
                             || !canAfford
                           }
                         >
-                          {purchasingPower === power.slug
-                            ? 'Comprando...'
-                            : canAfford
-                              ? 'Comprar'
-                              : 'Monedas insuficientes'}
+                          {purchasingPower === power.slug ? '...' : 'Comprar'}
                         </button>
+
                       </li>
                     );
                   })}
                 </ul>
               </div>
+
 
             <div className="panel-block">
               <h3>Últimos movimientos</h3>
