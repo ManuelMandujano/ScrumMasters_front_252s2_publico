@@ -98,7 +98,7 @@ const POWER_BEHAVIOR = {
   },
   autodestruccion: {
     requiresPiece: true,
-    owner: 'opponent',  // solo sobre pieza rival
+    owner: 'self',  // seleccionas tu propia ficha que explota
     label: 'Autodestrucción'
   },
   trampa: {
@@ -150,6 +150,8 @@ function GameBoard() {
         const seatParam = targetSeat ? `?seat=${targetSeat}` : '';
         const { data } = await apiClient.get(`/matches/${targetMatchId}/state${seatParam}`);
         setState(data);
+        return data; // 👈 IMPORTANTE: ahora devolvemos el estado
+
       } catch (err) {
         setError(err.response?.data?.error || 'No pudimos obtener el estado');
       } finally {
@@ -235,7 +237,7 @@ function GameBoard() {
   }, [state, selectedCell]);
 
   const handleCellClick = useCallback(
-    async ({ r, c, piece }) => {
+    async ({ r, c, piece, trap }) => {
       if (!matchId || !state) return;
       if (!effectiveSeat) return;
 
@@ -250,7 +252,13 @@ function GameBoard() {
         if (!piece) return;
         if (piece.seat !== effectiveSeat) return;
 
-        setSelectedCell({ r, c, pieceId: piece.id });
+        setSelectedCell({
+          r,
+          c,
+          pieceId: piece.id,
+          piece,
+          trap: trap || null
+        });
         setError(null);
         return;
       }
@@ -265,7 +273,7 @@ function GameBoard() {
       // Segundo clic: intento mover
       setSubmittingMove(true);
       try {
-        // 1) Mover la pieza
+        // 1) Mover la ficha
         await apiClient.post(`/matches/${matchId}/move`, {
           seat: effectiveSeat,
           pieceId: selectedCell.pieceId,
@@ -273,23 +281,35 @@ function GameBoard() {
           to: { r, c }
         });
 
-        // 2) Intentar terminar el turno inmediatamente después del movimiento
-        try {
-          await apiClient.post(`/matches/${matchId}/end-turn`, {
-            seat: effectiveSeat
-          });
-        } catch (endErr) {
-          const msg = endErr.response?.data?.error;
+        // 2) Traigo el estado actualizado DESDE el backend
+        const newState = await fetchState(matchId, effectiveSeat);
 
-          // Si el backend obliga a seguir capturando, NO lo mostramos como error grave
-          // (mensaje: "Must resolve capture chain")
-          if (msg && msg !== 'Must resolve capture chain') {
-            setError(msg);
+        // 3) Decido si el turno debe terminarse ahora o no
+        const me = (newState?.players || []).find(
+          (p) => p.seat === effectiveSeat
+        );
+        const ts = me?.turnState || {};
+
+        const mustContinueCapture = ts.mustContinueCapture;
+        const hasDoubleMove =
+          ts.doubleMove?.active && ts.doubleMove.remaining > 0;
+
+        // 👉 Si NO hay cadena de captura y NO quedan movimientos de doble_mov,
+        //    terminamos el turno automáticamente como antes.
+        if (!mustContinueCapture && !hasDoubleMove) {
+          try {
+            await apiClient.post(`/matches/${matchId}/end-turn`, {
+              seat: effectiveSeat
+            });
+            await fetchState(matchId, effectiveSeat);
+          } catch (endErr) {
+            const msg = endErr.response?.data?.error;
+            if (msg && msg !== 'Must resolve capture chain') {
+              setError(msg);
+            }
           }
         }
 
-        // 3) Refrescar estado completo desde el backend
-        await fetchState(matchId, effectiveSeat);
         setSelectedCell(null);
         setError(null);
       } catch (err) {
@@ -300,6 +320,7 @@ function GameBoard() {
     },
     [matchId, state, effectiveSeat, selectedCell, fetchState]
   );
+
 
   const handlePurchasePower = async (powerSlug) => {
     if (!matchId || !effectiveSeat) return;
@@ -396,8 +417,7 @@ function GameBoard() {
 
       // Poderes que actúan sobre una casilla (trampa, sanador, etc.)
       if (config.requiresCell && cell) {
-        payload.row = cell.r;
-        payload.col = cell.c;
+        payload.target = { r: cell.r, c: cell.c };
       }
 
       const { data } = await apiClient.post(
@@ -456,6 +476,8 @@ function GameBoard() {
   const opponentInventory = (state?.inventory || []).filter(
     (item) => item.seat && item.seat !== effectiveSeat
   );
+
+  
 
 
 
